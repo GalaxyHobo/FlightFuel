@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import altair as alt
 from bisect import bisect_left
 import os
 
@@ -8,23 +9,15 @@ st.markdown(
     """
     <style>
     /* Title as h3 with smaller font */
-    h3 {
-        font-size: 32px !important;
-    }
+    h3 { font-size: 32px !important; }
     /* Input label and number field larger */
     .stNumberInput label,
-    .stNumberInput input {
-        font-size: 18px !important;
-    }
+    .stNumberInput input { font-size: 18px !important; }
     /* Button text larger */
-    .stButton > button {
-        font-size: 18px !important;
-    }
+    .stButton > button { font-size: 18px !important; }
     /* Output text larger */
     .stMarkdown,
-    .stText {
-        font-size: 18px !important;
-    }
+    .stText { font-size: 18px !important; }
     </style>
     """,
     unsafe_allow_html=True
@@ -51,22 +44,22 @@ ys = df["changeFlightFuel_pct"].tolist()
 
 # ——— Interpolation function ———
 def interpolate(x):
-    # out of bounds
     if x < xs[0] or x > xs[-1]:
         return None
-    # find insertion index, ensure at least 1
     i = max(1, bisect_left(xs, x))
     x0, x1 = xs[i-1], xs[i]
     y0, y1 = ys[i-1], ys[i]
-    # linear interpolation
     return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+
+# ——— Initialize history for plotted points ———
+if "history" not in st.session_state:
+    st.session_state.history = []
 
 # ——— UI ———
 st.markdown("""
 <h3>Finlet 737-800 Flight Fuel Savings (SXS Config)</h3>
 """, unsafe_allow_html=True)
 
-# Number input with min/max matching data range
 x_val = st.number_input(
     f"Input range in nautical miles (min {xs[0]}, max {xs[-1]}):",
     min_value=float(xs[0]),
@@ -81,3 +74,14 @@ if st.button("Compute"):
         st.warning("❗️ Value out of range")
     else:
         st.success(f"% reduction in flight fuel = {result:.2f}%")
+        # Append new point to history
+        st.session_state.history.append({"range_nm": x_val, "savings_pct": result})
+
+# ——— Plot accumulated points ———
+if st.session_state.history:
+    hist_df = pd.DataFrame(st.session_state.history)
+    chart = alt.Chart(hist_df).mark_line(point=True).encode(
+        x=alt.X('range_nm:Q', title='Range (nm)'),
+        y=alt.Y('savings_pct:Q', title='% Fuel Savings')
+    ).properties(width=700, height=400)
+    st.altair_chart(chart, use_container_width=True)
