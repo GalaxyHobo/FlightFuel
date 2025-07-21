@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 from bisect import bisect_left
-import os
 
 # ——— Add custom CSS for font sizing ———
 st.markdown(
@@ -44,10 +43,8 @@ ys = df["changeFlightFuel_pct"].tolist()
 
 # ——— Interpolation function ———
 def interpolate(x):
-    # out of bounds
     if x < xs[0] or x > xs[-1]:
         return None
-    # find insertion index
     i = max(1, bisect_left(xs, x))
     x0, x1 = xs[i-1], xs[i]
     y0, y1 = ys[i-1], ys[i]
@@ -65,16 +62,17 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# number input with integer step cast as float
+# Number input widget
 x_val = st.number_input(
     f"Input range in nautical miles (min {xs[0]}, max {xs[-1]}):",
     min_value=float(xs[0]),
     max_value=float(xs[-1]),
     value=float(xs[0]),
     format="%.0f",
-    step=float(100)
+    step=100.0
 )
 
+# Compute button
 if st.button("Compute"):
     result = interpolate(x_val)
     if result is None:
@@ -83,7 +81,7 @@ if st.button("Compute"):
         st.success(f"Reduction in flight fuel = {result:.2f}%")
         st.session_state.history.append({"range_nm": x_val, "savings_pct": result})
 
-# ——— Plot accumulated points with larger markers and clear button ———
+# Plot and Clear
 if st.session_state.history:
     hist_df = pd.DataFrame(st.session_state.history)
     chart = alt.Chart(hist_df).mark_line(
@@ -93,6 +91,7 @@ if st.session_state.history:
         y=alt.Y('savings_pct:Q', title='% Fuel Savings')
     ).properties(width=700, height=400)
     st.altair_chart(chart, use_container_width=True)
-    if st.button("Clear", key="clear"):
+
+    # Clear button resets history
+    if st.button("Clear"):
         st.session_state.history = []
-        st.experimental_rerun()
