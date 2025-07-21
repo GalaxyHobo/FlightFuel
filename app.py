@@ -65,7 +65,8 @@ x_val = st.number_input(
     min_value=float(xs[0]),
     max_value=float(xs[-1]),
     value=float(xs[0]),
-    format="%.0f"
+    format="%.0f",
+    step=100
 )
 
 if st.button("Compute"):
