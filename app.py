@@ -44,8 +44,10 @@ ys = df["changeFlightFuel_pct"].tolist()
 
 # ——— Interpolation function ———
 def interpolate(x):
+    # out of bounds
     if x < xs[0] or x > xs[-1]:
         return None
+    # find insertion index
     i = max(1, bisect_left(xs, x))
     x0, x1 = xs[i-1], xs[i]
     y0, y1 = ys[i-1], ys[i]
@@ -56,17 +58,21 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 # ——— UI ———
-st.markdown("""
-<h3>Finlet 737-800 Flight Fuel Savings (SXS Config)</h3>
-""", unsafe_allow_html=True)
+st.markdown(
+    """
+    <h3>Finlet 737-800 Flight Fuel Savings (SXS Config)</h3>
+    """,
+    unsafe_allow_html=True
+)
 
+# number input with integer step cast as float
 x_val = st.number_input(
     f"Input range in nautical miles (min {xs[0]}, max {xs[-1]}):",
     min_value=float(xs[0]),
     max_value=float(xs[-1]),
     value=float(xs[0]),
     format="%.0f",
-    step=100
+    step=float(100)
 )
 
 if st.button("Compute"):
@@ -75,10 +81,9 @@ if st.button("Compute"):
         st.warning("❗️ Value out of range")
     else:
         st.success(f"Reduction in flight fuel = {result:.2f}%")
-        # Append new point to history
         st.session_state.history.append({"range_nm": x_val, "savings_pct": result})
 
-# ——— Plot accumulated points with larger markers ———
+# ——— Plot accumulated points with larger markers and clear button ———
 if st.session_state.history:
     hist_df = pd.DataFrame(st.session_state.history)
     chart = alt.Chart(hist_df).mark_line(
@@ -88,3 +93,6 @@ if st.session_state.history:
         y=alt.Y('savings_pct:Q', title='% Fuel Savings')
     ).properties(width=700, height=400)
     st.altair_chart(chart, use_container_width=True)
+    if st.button("Clear", key="clear"):
+        st.session_state.history = []
+        st.experimental_rerun()
