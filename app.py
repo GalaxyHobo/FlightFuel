@@ -33,11 +33,11 @@ def interpolate(x):
     return y0 + (y1-y0)*(x - x0)/(x1 - x0)
 
 # ——— UI ———
-st.title("🔍 Linear Interpolator")
-x_val = st.number_input("Input a:", format="%.6f")
+st.title("🔍 737-800 Flight Fuel Savings - Finlets, SXS Config")
+x_val = st.number_input("Input Range in nautical miles (min 400):", format="%.1f")
 if st.button("Compute"):
     result = interpolate(x_val)
     if result is None:
         st.warning("❗️ Value out of range")
     else:
-        st.success(f"Interpolated b = **{result:.6f}**")
+        st.success(f"Flight Fuel Savings (%) = **{result:.2f}**")
