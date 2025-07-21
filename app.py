@@ -15,8 +15,13 @@ if "authed" not in st.session_state:
         st.stop()
 
 # ——— load data.csv ———
-df = pd.read_csv("data.csv")
-xs, ys = df["range_nm"].tolist(), df["changeFlightFuel_pct"].tolist()
+# load data.csv, strip any leading/trailing spaces in the headers
+df = pd.read_csv("data.csv", skipinitialspace=True)
+df.columns = df.columns.str.strip()
+
+# now these will definitely match
+xs = df["range_nm"].tolist()
+ys = df["changeFlightFuel_pct"].tolist()
 
 # ——— interpolation function ———
 def interpolate(x):
