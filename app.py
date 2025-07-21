@@ -65,7 +65,7 @@ x_val = st.number_input(
     min_value=float(xs[0]),
     max_value=float(xs[-1]),
     value=float(xs[0]),
-    format="%.1f"
+    format="%.0f"
 )
 
 if st.button("Compute"):
@@ -73,7 +73,7 @@ if st.button("Compute"):
     if result is None:
         st.warning("❗️ Value out of range")
     else:
-        st.success(f"% reduction in flight fuel = {result:.2f}%")
+        st.success(f"Reduction in flight fuel = {result:.2f}%")
         # Append new point to history
         st.session_state.history.append({"range_nm": x_val, "savings_pct": result})
 
