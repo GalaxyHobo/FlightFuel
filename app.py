@@ -77,10 +77,12 @@ if st.button("Compute"):
         # Append new point to history
         st.session_state.history.append({"range_nm": x_val, "savings_pct": result})
 
-# ——— Plot accumulated points ———
+# ——— Plot accumulated points with larger markers ———
 if st.session_state.history:
     hist_df = pd.DataFrame(st.session_state.history)
-    chart = alt.Chart(hist_df).mark_line(point=True).encode(
+    chart = alt.Chart(hist_df).mark_line(
+        point={"filled": True, "size": 150}
+    ).encode(
         x=alt.X('range_nm:Q', title='Range (nm)'),
         y=alt.Y('savings_pct:Q', title='% Fuel Savings')
     ).properties(width=700, height=400)
