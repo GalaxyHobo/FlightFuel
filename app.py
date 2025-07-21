@@ -63,12 +63,12 @@ def interpolate(x):
 
 # ——— UI ———
 st.markdown("""
-<h3>737-800 Flight Fuel Savings - Finlets, SXS Config</h3>
+<h3>Finlet 737-800 Flight Fuel Savings (SXS Config)</h3>
 """, unsafe_allow_html=True)
 
 # Number input with min/max matching data range
 x_val = st.number_input(
-    f"Input Range in nautical miles (min {xs[0]}, max {xs[-1]}):",
+    f"Input range in nautical miles (min {xs[0]}, max {xs[-1]}):",
     min_value=float(xs[0]),
     max_value=float(xs[-1]),
     value=float(xs[0]),
@@ -80,4 +80,4 @@ if st.button("Compute"):
     if result is None:
         st.warning("❗️ Value out of range")
     else:
-        st.success(f"Interpolated changeFlightFuel_pct = {result:.2f}%")
+        st.success(f"% reduction in flight fuel = {result:.2f}%")
