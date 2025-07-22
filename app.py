@@ -70,7 +70,7 @@ if st.button("Compute"):
     if result_pct is None or result_gal is None:
         st.warning("❗️ Value out of range")
     else:
-        st.success(f"Reduction in flight fuel = {result_pct:.2f}%  |  {result_gal:,.0f} gal")
+        st.success(f"Reduction in flight fuel = {result_pct:.2f}%  |  {result_gal:,.1f} gal")
         st.session_state.history.append({
             "range_nm": x_val,
             "savings_pct": result_pct,
